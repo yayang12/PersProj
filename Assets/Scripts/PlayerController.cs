@@ -6,11 +6,16 @@ public class PlayerController : MonoBehaviour
 {
     public float speed = 10.0f;
     private Rigidbody playerRb;
+    private float zBound = 20;
+    public float jumpForce;
+    public float gravityModifier;
+    public bool isOnGround = true;
 
     // Start is called before the first frame update
     void Start()
     {
         playerRb = GetComponent<Rigidbody>();
+        Physics.gravity *= gravityModifier;
     }
 
     // Update is called once per frame
@@ -22,9 +27,22 @@ public class PlayerController : MonoBehaviour
         playerRb.AddForce(Vector3.forward * speed * verticalInput);
         playerRb.AddForce(Vector3.right * speed * horizontalInput);
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (transform.position.z < -zBound)
         {
-            playerRb.AddForce(Vector3.up * 10, ForceMode.Impulse);
+            transform.position = new Vector3(transform.position.x, transform.position.y, -zBound);
         }
+    //Jump when space is pressed
+        if (Input.GetKeyDown(KeyCode.Space) && isOnGround)
+        {
+            playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            isOnGround = false;
+        }
+        
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        isOnGround = true;
+    }
+
 }
